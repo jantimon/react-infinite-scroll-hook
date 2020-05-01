@@ -30,6 +30,7 @@
     "no-constant-condition": "warn",
     "no-console": "warn",
     "no-empty": "warn",
+    "no-case-declarations": "off",
     "prefer-template": "warn",
     "react/self-closing-comp": "warn",
     "react-hooks/rules-of-hooks": "error",

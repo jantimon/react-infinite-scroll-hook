@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { render } from 'react-dom';
 import InfiniteList from './InfiniteList';
 import styled from 'styled-components';
+import { INFINITE_SCROLL_DIRECTIONS } from '../../src/useInfiniteScroll';
 
 const ListContainer = styled.div`
   max-height: ${props => (props.scrollable ? '600px' : 'auto')};
@@ -12,20 +13,41 @@ const ListContainer = styled.div`
 
 function Demo() {
   const [scrollParent, setScrollParent] = useState(false);
+  const [direction, setDirection] = useState();
 
-  function handleChange(e) {
+  function handleScrollParentChange(e) {
     const checked = e.target.checked;
     setScrollParent(checked);
   }
 
+  function handleDirectionChange(e) {
+    const checked = e.target.checked;
+    setDirection(
+      checked
+        ? INFINITE_SCROLL_DIRECTIONS.toTop
+        : INFINITE_SCROLL_DIRECTIONS.toBottom,
+    );
+  }
+
   return (
     <React.Fragment>
-      <h1>Infinite List</h1>
-      <h3>Created by using “react-infinite-scroll-hook”</h3>
-      <input type="checkbox" checked={scrollParent} onChange={handleChange} />
+      <input
+        type="checkbox"
+        checked={scrollParent}
+        onChange={handleScrollParentChange}
+      />
       Scrollable Parent
+      <input
+        type="checkbox"
+        checked={direction === INFINITE_SCROLL_DIRECTIONS.toTop}
+        onChange={handleDirectionChange}
+      />
+      Scroll to top
       <ListContainer scrollable={scrollParent}>
-        <InfiniteList scrollContainer={scrollParent ? 'parent' : 'window'} />
+        <InfiniteList
+          scrollContainer={scrollParent ? 'parent' : 'window'}
+          direction={direction}
+        />
       </ListContainer>
     </React.Fragment>
   );

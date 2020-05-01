@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useInfiniteScroll } from '../../src';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
+import { INFINITE_SCROLL_DIRECTIONS } from '../../src/useInfiniteScroll';
 
 const List = styled.ul`
   list-style: none;
@@ -16,6 +17,10 @@ const ListItem = styled.li`
   padding: 8px;
   margin: 4px;
 `;
+
+const Loading = () => {
+  return <ListItem>Loading...</ListItem>;
+};
 
 const ARRAY_SIZE = 20;
 const RESPONSE_TIME = 1000;
@@ -38,7 +43,7 @@ function loadItems(prevArray = [], startCursor = 0) {
   });
 }
 
-function InfiniteList({ scrollContainer }) {
+function InfiniteList({ scrollContainer, direction }) {
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState([]);
 
@@ -51,26 +56,36 @@ function InfiniteList({ scrollContainer }) {
   }
 
   const infiniteRef = useInfiniteScroll({
+    threshold: 600,
     loading,
     // This value is set to "true" for this demo only. You will need to
     // get this value from the API when you request your items.
     hasNextPage: true,
     onLoadMore: handleLoadMore,
     scrollContainer,
+    direction,
   });
 
   return (
     <List ref={infiniteRef}>
-      {items.map(item => (
-        <ListItem key={item.key}>{item.value}</ListItem>
-      ))}
-      {loading && <ListItem>Loading...</ListItem>}
+      {direction === INFINITE_SCROLL_DIRECTIONS.toTop && loading && <Loading />}
+      {items
+        .sort((a, b) =>
+          direction === INFINITE_SCROLL_DIRECTIONS.toTop
+            ? b.key - a.key
+            : a.key - b.key,
+        )
+        .map(item => (
+          <ListItem key={item.key}>{item.value}</ListItem>
+        ))}
+      {direction !== INFINITE_SCROLL_DIRECTIONS.toTop && loading && <Loading />}
     </List>
   );
 }
 
 InfiniteList.propTypes = {
   scrollContainer: PropTypes.oneOf(['window', 'parent']),
+  direction: PropTypes.oneOf(Object.values(INFINITE_SCROLL_DIRECTIONS)),
 };
 
 export default InfiniteList;
