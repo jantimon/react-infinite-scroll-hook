@@ -1,26 +1,19 @@
 import { useRef, useEffect } from 'react';
-import { Maybe } from './types';
 
 function useInterval(callback: VoidFunction, delay: number) {
-  const savedCallback = useRef<Maybe<VoidFunction>>(null);
+  const savedCallback = useRef<VoidFunction>(callback);
+  savedCallback.current = callback;
 
   useEffect(() => {
-    savedCallback.current = callback;
-  }, [callback]);
-
-  useEffect(() => {
-    function tick() {
-      savedCallback.current?.();
+    if (!delay) {
+        return;
     }
-
-    if (delay) {
-      const id = setInterval(() => {
-        tick();
-      }, delay);
-      return () => {
+    const id = setInterval(() => {
+         savedCallback.current();
+    }, delay);
+    return () => {
         clearInterval(id);
-      };
-    }
+    };
   }, [delay]);
 }
 
